@@ -1,0 +1,6 @@
+apiVersion: cluster.wanglet.com/v1alpha1
+kind: KubesprayJob
+metadata:
+  name: kubesprayjob-sample
+spec:
+  # TODO(user): Add fields here
