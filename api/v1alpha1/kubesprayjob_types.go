@@ -17,7 +17,26 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
+
+type KubesprayNode struct {
+	Name     string            `json:"name"`
+	Role     string            `json:"role"`
+	Host     string            `json:"host,omitempty"`
+	User     string            `json:"user,omitempty"`
+	Password string            `json:"password,omitempty"`
+	Vars     map[string]string `json:"vars,omitempty"`
+}
+
+type KubesprayJobType string
+
+var (
+	KubesprayJobTypeScale               KubesprayJobType = "scale"
+	KubesprayJobTypeRemoveNode          KubesprayJobType = "remove-node"
+	KubesprayJobTypeUpgrade             KubesprayJobType = "upgrade"
+	KubesprayJobTypeRecoverControlPlane KubesprayJobType = "recover-control-plane"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -27,15 +46,18 @@ import (
 type KubesprayJobSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of KubesprayJob. Edit kubesprayjob_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	Type               KubesprayJobType `json:"type"`
+	Nodes              []KubesprayNode  `json:"nodes"`
+	ExtraVarsConfigmap string           `json:"extraVarsConfigmap"`
 }
 
 // KubesprayJobStatus defines the observed state of KubesprayJob
 type KubesprayJobStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	Phase          corev1.PodPhase `json:"phase,omitempty"`
+	StartTime      *metav1.Time    `json:"startTime,omitempty"`
+	CompletionTime *metav1.Time    `json:"completionTime,omitempty"`
 }
 
 //+kubebuilder:object:root=true

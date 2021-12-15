@@ -52,7 +52,9 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
+	var kubesprayImage string
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
+	flag.StringVar(&kubesprayImage, "kubespray-image", "quay.io/kubespray/kubespray:v2.17.1", "The image name of kubespray.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
@@ -79,8 +81,11 @@ func main() {
 	}
 
 	if err = (&controllers.KubesprayJobReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:         mgr.GetClient(),
+		Scheme:         mgr.GetScheme(),
+		KubesprayImage: kubesprayImage,
+		Log:            ctrl.Log.WithName("controller").WithName("kubesprayjob"),
+		Recorder:       mgr.GetEventRecorderFor("kubesprayjob"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "KubesprayJob")
 		os.Exit(1)
